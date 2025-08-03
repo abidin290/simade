@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Galeri Dokumentasi - AdminLTE</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <style>
+    .gallery-item { margin-bottom: 1.5rem; }
+    .img-fluid { height: 200px; width: 100%; object-fit: cover; }
+    .loading-container { display: flex; justify-content: center; align-items: center; flex-direction: column; min-height: 300px; }
+    .filter-button { margin-right: 5px; margin-bottom: 5px; }
+  </style>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav"><li class="nav-item"><a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a></li></ul>
+  </nav>
+
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="main.html" class="brand-link"><i class="fa fa-database brand-image img-circle elevation-3" style="opacity: .8"></i><span class="brand-text font-weight-light">Data Penduduk</span></a>
+    <div class="sidebar">
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex"><div class="image"><i class="fa fa-user-circle fa-2x text-white"></i></div><div class="info"><a href="#" class="d-block" id="usernameLabel">Pengguna</a></div></div>
+      <nav class="mt-2" id="sidebar-nav"></nav>
+    </div>
+  </aside>
+
+  <div class="content-wrapper">
+    <section class="content-header">
+      <div class="container-fluid"><div class="row mb-2"><div class="col-sm-6"><h1>Galeri Dokumentasi</h1></div></div></div>
+    </section>
+    <section class="content">
+      <div class="container-fluid">
+        <div class="card card-primary card-outline">
+          <div class="card-header">
+            <h3 class="card-title" id="albumTitle">Album Foto</h3>
+          </div>
+          <div class="card-body">
+            <div id="filter-container" class="mb-3">
+              <!-- Tombol filter album akan dibuat di sini -->
+            </div>
+            <div id="gallery-container" class="row">
+              <!-- Gambar akan dimuat di sini -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="main-footer"><strong>Copyright &copy; 2024-2025.</strong> All rights reserved.</footer>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+<script>
+  const MAIN_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVJsNbfIliujHhgYUPGWFwyGse-Z5m4l7A-CNr2qwXOnj2xZBQKASeTQLRgW5zLvpW/exec"; // PASTIKAN URL INI BENAR
+  const GALLERY_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwP75jkjqhRlQAv0llRdMVRVf0-qWGyFg_4OrNBFyKAEqsx7U1Tcyk4i9GJs5dmOZM/exec"; // PASTIKAN URL INI BENAR
+  const authToken = sessionStorage.getItem("authToken");
+  const galleryContainer = document.getElementById('gallery-container');
+  const filterContainer = document.getElementById('filter-container');
+  const albumTitle = document.getElementById('albumTitle');
+
+  if (!authToken) { window.location.href = "index.html"; }
+
+  // --- SKRIP SIDEBAR DINAMIS & LOGOUT ---
+  document.addEventListener("DOMContentLoaded", function() {
+    const username = sessionStorage.getItem("username") || "Pengguna";
+    const userRole = sessionStorage.getItem("userRole") || "user";
+    document.getElementById("usernameLabel").textContent = username;
+    const currentPage = window.location.pathname.split('/').pop();
+    let navHTML = '<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false"><li class="nav-header">NAVIGASI UTAMA</li>';
+    const menuItems = [
+        { href: "main.html", icon: "fa-tachometer-alt", text: "Dashboard Penduduk" },
+        { href: "keluarga.html", icon: "fa-users", text: "Manajemen KK" },
+        { href: "statistik.html", icon: "fa-chart-pie", text: "Statistik" },
+        { href: "galeri.html", icon: "fa-image", text: "Galeri" }
+    ];
+    menuItems.forEach(item => {
+        const activeClass = (currentPage === item.href) ? 'active' : '';
+        navHTML += `<li class="nav-item"><a href="${item.href}" class="nav-link ${activeClass}"><i class="nav-icon fas ${item.icon}"></i><p>${item.text}</p></a></li>`;
+    });
+    if (userRole === 'admin') {
+        const activeClass = (currentPage === 'admin_panel.html') ? 'active' : '';
+        navHTML += '<li class="nav-header">PENGATURAN</li>';
+        navHTML += `<li class="nav-item"><a href="admin_panel.html" class="nav-link ${activeClass}"><i class="nav-icon fas fa-cogs"></i><p>Admin Panel</p></a></li>`;
+    }
+    navHTML += `<li class="nav-item" style="margin-top: 20px;"><a href="#" onclick="logout()" class="nav-link bg-danger"><i class="nav-icon fas fa-sign-out-alt"></i><p>Logout</p></a></li></ul>`;
+    document.getElementById("sidebar-nav").innerHTML = navHTML;
+  });
+
+  function logout(){
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("username");
+    sessionStorage.removeItem("userRole");
+    window.location.href="index.html";
+  }
+  
+  // --- SKRIP UNTUK HALAMAN GALERI ---
+  function showError(message, details = '') {
+    galleryContainer.innerHTML = `<div class="col-12"><div class="alert alert-danger"><h5><i class="icon fas fa-ban"></i> ${message}</h5><p>${details}</p><button class="btn btn-outline-danger mt-2" onclick="loadImages()">Coba Lagi</button></div></div>`;
+  }
+
+  function showLoading(message = 'Memuat...') {
+    galleryContainer.innerHTML = `<div class="col-12 loading-container"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">${message}</p></div>`;
+  }
+  
+  async function loadImages() {
+    showLoading('Mengambil pengaturan album...');
+    try {
+      const settingsResponse = await fetch(MAIN_SCRIPT_URL, {
+          method: "POST", 
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "getFolderId", token: authToken })
+      });
+      const settingsData = await settingsResponse.json();
+
+      if (!settingsData.success || !settingsData.settings.activeIds || settingsData.settings.activeIds.length === 0) {
+          throw new Error("Belum ada album galeri yang diaktifkan. Silakan pilih satu atau lebih di Admin Panel.");
+      }
+      
+      const activeIds = settingsData.settings.activeIds;
+      albumTitle.textContent = `Menampilkan ${activeIds.length} Album Terpilih`;
+      showLoading(`Menghubungkan ke ${activeIds.length} album...`);
+
+      const galleryResponse = await fetch(`${GALLERY_SCRIPT_URL}?folderIds=${activeIds.join(',')}`);
+      const data = await galleryResponse.json();
+      
+      if (!data.success) { throw new Error(data.error || 'Skrip galeri error'); }
+      
+      const imagesData = data.images || [];
+      if (imagesData.length === 0) {
+        showError('Tidak ada gambar ditemukan di semua album yang dipilih.');
+        filterContainer.innerHTML = '';
+        return;
+      }
+      
+      const albums = [...new Set(imagesData.map(img => img.album))];
+      let filterHTML = '<button class="btn btn-primary filter-button" onclick="filterAlbum(\'all\')">Semua Album</button>';
+      if (albums.length > 1) { // Hanya tampilkan filter jika ada lebih dari 1 album
+        albums.forEach(album => {
+          filterHTML += `<button class="btn btn-outline-secondary filter-button" onclick="filterAlbum('${album}')">${album}</button>`;
+        });
+      } else {
+        filterHTML = ''; // Kosongkan jika hanya 1 album
+      }
+      filterContainer.innerHTML = filterHTML;
+
+      let galleryHTML = '';
+      imagesData.forEach((img) => {
+        galleryHTML += `
+          <div class="col-sm-6 col-md-4 col-lg-3 gallery-item" data-album="${img.album}">
+            <a href="${img.url}" data-toggle="lightbox" data-title="${img.name}" data-gallery="active-gallery">
+              <img src="${img.url}" class="img-fluid img-thumbnail" alt="${img.name}" onerror="this.parentElement.style.display='none'">
+            </a>
+          </div>
+        `;
+      });
+      galleryContainer.innerHTML = galleryHTML;
+      
+    } catch (error) {
+      albumTitle.textContent = "Galeri";
+      console.error('Gagal memuat galeri:', error);
+      showError('Gagal Memuat Galeri', error.message);
+    }
+  }
+
+  function filterAlbum(albumName) {
+      const allItems = document.querySelectorAll('.gallery-item');
+      allItems.forEach(item => {
+          if (albumName === 'all' || item.dataset.album === albumName) {
+              item.style.display = 'block';
+          } else {
+              item.style.display = 'none';
+          }
+      });
+      const allButtons = document.querySelectorAll('.filter-button');
+      allButtons.forEach(button => {
+          const buttonAlbumName = button.textContent;
+          if ((albumName === 'all' && buttonAlbumName === 'Semua Album') || buttonAlbumName === albumName) {
+              button.classList.add('btn-primary');
+              button.classList.remove('btn-outline-secondary');
+          } else {
+              button.classList.remove('btn-primary');
+              button.classList.add('btn-outline-secondary');
+          }
+      });
+  }
+  
+  $(function () {
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+      event.preventDefault();
+      $(this).ekkoLightbox({
+        alwaysShowClose: true,
+        maxHeight: $(window).height() * 0.85
+      });
+    });
+    loadImages();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistik Penduduk - AdminLTE</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .info-box .info-box-icon { width: 70px; }
+  </style>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav"><li class="nav-item"><a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a></li></ul>
+  </nav>
+
+  <!-- SIDEBAR DINAMIS BARU -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="main.html" class="brand-link">
+      <i class="fa fa-database brand-image img-circle elevation-3" style="opacity: .8"></i>
+      <span class="brand-text font-weight-light">Data Penduduk</span>
+    </a>
+    <div class="sidebar">
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image"><i class="fa fa-user-circle fa-2x text-white"></i></div>
+        <div class="info"><a href="#" class="d-block" id="usernameLabel">Pengguna</a></div>
+      </div>
+      <nav class="mt-2" id="sidebar-nav"></nav>
+    </div>
+  </aside>
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid"><div class="row mb-2"><div class="col-sm-6"><h1 class="m-0">Statistik Penduduk</h1></div></div></div>
+    </div>
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 col-sm-6 col-md-3"><div class="info-box"><span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span><div class="info-box-content"><span class="info-box-text">Total Penduduk</span><span class="info-box-number" id="totalPenduduk">0</span></div></div></div>
+          <div class="col-12 col-sm-6 col-md-3"><div class="info-box mb-3"><span class="info-box-icon bg-olive elevation-1"><i class="fas fa-house-user"></i></span><div class="info-box-content"><span class="info-box-text">Jumlah KK</span><span class="info-box-number" id="jumlahKK">0</span></div></div></div>
+          <div class="col-12 col-sm-6 col-md-3"><div class="info-box mb-3"><span class="info-box-icon bg-primary elevation-1"><i class="fas fa-male"></i></span><div class="info-box-content"><span class="info-box-text">Laki-laki</span><span class="info-box-number" id="jumlahLaki">0</span></div></div></div>
+          <div class="col-12 col-sm-6 col-md-3"><div class="info-box mb-3"><span class="info-box-icon bg-danger elevation-1"><i class="fas fa-female"></i></span><div class="info-box-content"><span class="info-box-text">Perempuan</span><span class="info-box-number" id="jumlahPerempuan">0</span></div></div></div>
+        </div>
+        <div class="row">
+             <div class="col-12 col-sm-6 col-md-4"><div class="info-box mb-3"><span class="info-box-icon bg-success elevation-1"><i class="fas fa-child"></i></span><div class="info-box-content"><span class="info-box-text">Anak-anak (0-17)</span><span class="info-box-number" id="jumlahAnak">0</span></div></div></div>
+             <div class="col-12 col-sm-6 col-md-4"><div class="info-box mb-3"><span class="info-box-icon bg-warning elevation-1"><i class="fas fa-user-tie"></i></span><div class="info-box-content"><span class="info-box-text">Dewasa (18-60)</span><span class="info-box-number" id="jumlahDewasa">0</span></div></div></div>
+             <div class="col-12 col-sm-6 col-md-4"><div class="info-box mb-3"><span class="info-box-icon bg-secondary elevation-1"><i class="fas fa-user-clock"></i></span><div class="info-box-content"><span class="info-box-text">Lansia (>60)</span><span class="info-box-number" id="jumlahLansia">0</span></div></div></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card card-danger"><div class="card-header"><h3 class="card-title">Grafik Jenis Kelamin</h3></div><div class="card-body"><canvas id="genderChart"></canvas></div></div>
+            <div class="card card-purple"><div class="card-header"><h3 class="card-title">Grafik Sebaran Dusun</h3></div><div class="card-body"><canvas id="dusunChart"></canvas></div></div>
+          </div>
+          <div class="col-md-6">
+            <div class="card card-success"><div class="card-header"><h3 class="card-title">Grafik Kelompok Usia</h3></div><div class="card-body"><canvas id="ageChart"></canvas></div></div>
+          </div>
+        </div>
+        <div class="row">
+           <div class="col-md-12"><div class="card card-info"><div class="card-header"><h3 class="card-title">Grafik Pekerjaan</h3></div><div class="card-body" style="height: 500px;"><canvas id="jobChart"></canvas></div></div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="main-footer"><strong>Copyright &copy; 2024-2025.</strong> All rights reserved.</footer>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVJsNbfIliujHhgYUPGWFwyGse-Z5m4l7A-CNr2qwXOnj2xZBQKASeTQLRgW5zLvpW/exec"; // PASTIKAN URL INI BENAR
+    const authToken = sessionStorage.getItem("authToken");
+    if (!authToken) window.location.href = "index.html";
+
+    // --- SKRIP SIDEBAR DINAMIS ---
+    document.addEventListener("DOMContentLoaded", function() {
+        const username = sessionStorage.getItem("username") || "Pengguna";
+        const userRole = sessionStorage.getItem("userRole") || "user";
+        document.getElementById("usernameLabel").textContent = username;
+        const currentPage = window.location.pathname.split('/').pop();
+        let navHTML = '<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false"><li class="nav-header">NAVIGASI UTAMA</li>';
+        const menuItems = [
+            { href: "main.html", icon: "fa-tachometer-alt", text: "Dashboard Penduduk" },
+            { href: "keluarga.html", icon: "fa-users", text: "Manajemen KK" },
+            { href: "statistik.html", icon: "fa-chart-pie", text: "Statistik" },
+            { href: "galeri.html", icon: "fa-image", text: "Galeri" }
+        ];
+        menuItems.forEach(item => {
+            const activeClass = (currentPage === item.href) ? 'active' : '';
+            navHTML += `<li class="nav-item"><a href="${item.href}" class="nav-link ${activeClass}"><i class="nav-icon fas ${item.icon}"></i><p>${item.text}</p></a></li>`;
+        });
+        if (userRole === 'admin') {
+            const activeClass = (currentPage === 'admin_panel.html') ? 'active' : '';
+            navHTML += '<li class="nav-header">PENGATURAN</li>';
+            navHTML += `<li class="nav-item"><a href="admin_panel.html" class="nav-link ${activeClass}"><i class="nav-icon fas fa-cogs"></i><p>Admin Panel</p></a></li>`;
+        }
+        navHTML += `<li class="nav-item" style="margin-top: 20px;"><a href="#" onclick="logout()" class="nav-link bg-danger"><i class="nav-icon fas fa-sign-out-alt"></i><p>Logout</p></a></li></ul>`;
+        document.getElementById("sidebar-nav").innerHTML = navHTML;
+    });
+
+    function logout(){
+      sessionStorage.removeItem("authToken");
+      sessionStorage.removeItem("username");
+      sessionStorage.removeItem("userRole");
+      window.location.href="index.html";
+    }
+
+    // --- Skrip untuk halaman ini ---
+    async function fetchPenduduk() { /* ... (fungsi tetap sama) ... */ }
+    function getAgeFromDate(dobStr) { /* ... (fungsi tetap sama) ... */ }
+    function countBy(data, key) { /* ... (fungsi tetap sama) ... */ }
+    function categorizeAgeForChart(age) { /* ... (fungsi tetap sama) ... */ }
+    function countAgesForChart(data) { /* ... (fungsi tetap sama) ... */ }
+    function drawChart(ctxId, labels, data, type, chartLabel) { /* ... (fungsi tetap sama) ... */ }
+    async function generateStatistics() { /* ... (fungsi tetap sama) ... */ }
+
+    // Implementasi fungsi
+    async function fetchPenduduk() {
+      const res = await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ action: "listPenduduk", token: authToken }) });
+      const data = await res.json();
+      return data.success ? data.penduduk : [];
+    }
+    function getAgeFromDate(dobStr) {
+        if (!dobStr) return null;
+        const diff = Date.now() - new Date(dobStr).getTime();
+        return Math.floor(diff / 31557600000);
+    }
+    function countBy(data, key) {
+        return data.reduce((acc, val) => { const k = val[key] || "Tidak Diketahui"; acc[k] = (acc[k] || 0) + 1; return acc; }, {});
+    }
+    function categorizeAgeForChart(age) {
+        if (age <= 17) return "0–17"; if (age <= 30) return "18–30"; if (age <= 45) return "31–45"; if (age <= 60) return "46–60"; return "60+";
+    }
+    function countAgesForChart(data) {
+        const groups = {};
+        data.forEach(p => { const umur = getAgeFromDate(p.tanggalLahir); if (umur === null) return; const kategori = categorizeAgeForChart(umur); groups[kategori] = (groups[kategori] || 0) + 1; });
+        const sortedKeys = Object.keys(groups).sort((a, b) => parseInt(a) - parseInt(b));
+        const sortedGroups = {};
+        sortedKeys.forEach(key => sortedGroups[key] = groups[key]);
+        return sortedGroups;
+    }
+    function drawChart(ctxId, labels, data, type = 'bar', chartLabel = "Jumlah") {
+        new Chart(document.getElementById(ctxId), {
+            type: type,
+            data: { labels: labels, datasets: [{ label: chartLabel, data: data, backgroundColor: type === 'pie' ? ['#6f42c1', '#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8'] : '#007BFF', borderWidth: 1 }] },
+            options: { responsive: true, maintainAspectRatio: false, indexAxis: type === "bar" && ctxId === "jobChart" ? "y" : "x", plugins: { legend: { display: type === "pie", position: 'top' } }, scales: type !== "pie" ? { x: { beginAtZero: true }, y: { beginAtZero: true } } : {} }
+        });
+    }
+    async function generateStatistics() {
+        const penduduk = await fetchPenduduk();
+        if (penduduk.length === 0) { document.getElementById('totalPenduduk').textContent = 'Data Kosong'; return; }
+        let laki = 0, perempuan = 0, genderLain = 0, anak = 0, dewasa = 0, lansia = 0;
+        penduduk.forEach(p => {
+            const jk = String(p.jenisKelamin || '').toLowerCase();
+            if (jk === 'laki-laki' || jk === 'l') laki++; else if (jk === 'perempuan' || jk === 'p') perempuan++; else genderLain++;
+            const umur = getAgeFromDate(p.tanggalLahir);
+            if (umur !== null) { if (umur <= 17) anak++; else if (umur <= 60) dewasa++; else lansia++; }
+        });
+        const kkSet = new Set(penduduk.map(p => p.noKK).filter(Boolean));
+        document.getElementById('totalPenduduk').textContent = penduduk.length;
+        document.getElementById('jumlahKK').textContent = kkSet.size;
+        document.getElementById('jumlahLaki').textContent = laki;
+        document.getElementById('jumlahPerempuan').textContent = perempuan;
+        document.getElementById('jumlahAnak').textContent = anak;
+        document.getElementById('jumlahDewasa').textContent = dewasa;
+        document.getElementById('jumlahLansia').textContent = lansia;
+        const genderLabels = ['Laki-laki', 'Perempuan'];
+        const genderData = [laki, perempuan];
+        if (genderLain > 0) { genderLabels.push('Tidak Diketahui'); genderData.push(genderLain); }
+        drawChart("genderChart", genderLabels, genderData, "pie");
+        const ageStats = countAgesForChart(penduduk);
+        drawChart("ageChart", Object.keys(ageStats), Object.values(ageStats), "bar", "Jumlah Penduduk");
+        const jobStats = countBy(penduduk, "pekerjaan");
+        drawChart("jobChart", Object.keys(jobStats), Object.values(jobStats), "bar", "Jumlah Pekerja");
+        const dusunStats = countBy(penduduk, "dusun");
+        drawChart("dusunChart", Object.keys(dusunStats), Object.values(dusunStats), "pie", "Jumlah Penduduk");
+    }
+
+    $(document).ready(function() {
+        generateStatistics();
+    });
+</script>
+</body>
+</html>
